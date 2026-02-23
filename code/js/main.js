@@ -4,6 +4,8 @@ import { RenderPass }      from 'three/addons/postprocessing/RenderPass.js';
 import { ShaderPass }      from 'three/addons/postprocessing/ShaderPass.js';
 import { GlitchPass }      from 'three/addons/postprocessing/GlitchPass.js';
 import { OutputPass }      from 'three/addons/postprocessing/OutputPass.js';
+import { FontLoader }      from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry }    from 'three/addons/geometries/TextGeometry.js';
 import {
   shuffle,
   initLayers,
@@ -135,7 +137,7 @@ function createFloatingImages(imagePaths) {
 //  THREE.JS — PARTICULES NÉON
 // ═══════════════════════════════════════════════
 
-const PARTICLE_COUNT    = 500;
+const PARTICLE_COUNT    = 1200;
 const particleGeo       = new THREE.BufferGeometry();
 const particlePositions = new Float32Array(PARTICLE_COUNT * 3);
 const particleColors    = new Float32Array(PARTICLE_COUNT * 3);
@@ -193,12 +195,63 @@ for (let i = 0; i < BAR_COUNT; i++) {
 
   const bar   = new THREE.Mesh(geo, mat);
   const angle = (t - 0.5) * Math.PI * 0.8;
-  bar.position.set(Math.sin(angle) * 10, -2, Math.cos(angle) * 4 - 12);
-  bar.lookAt(0, -2, -5);
+  bar.position.set(Math.sin(angle) * 10, -3.5, Math.cos(angle) * 4 - 12);
+  bar.lookAt(0, -3.5, -5);
 
   scene.add(bar);
   visualizerBars.push(bar);
 }
+
+// ═══════════════════════════════════════════════
+//  THREE.JS — TITRE TEXTE 3D COURBÉ
+// ═══════════════════════════════════════════════
+
+const fontLoader = new FontLoader();
+fontLoader.load(
+  'https://cdn.jsdelivr.net/npm/three@0.169.0/examples/fonts/helvetiker_bold.typeface.json',
+  (font) => {
+    // Lettres avec espacement vaporwave
+    const letters = ['C', ' ', 'R', ' ', 'A', ' ', 'Z', ' ', 'Y', ' ', ' ', ' ', 'D', ' ', 'A', ' ', 'N'];
+    const radius  = 10;   // même rayon que le visualiseur
+    const yPos    = -5;   // sous le visualiseur
+    const zBase   = -12;  // même profondeur que le visualiseur
+
+    // Arc centré, même amplitude que le visualiseur (PI * 0.8)
+    const totalAngle = Math.PI * 0.8;
+    const step       = totalAngle / (letters.length - 1);
+
+    letters.forEach((char, i) => {
+      if (char === ' ') return; // ignorer les espaces
+
+      const geo = new TextGeometry(char, {
+        font,
+        size:           0.6,
+        depth:          0.15,
+        curveSegments:  6,
+        bevelEnabled:   false,
+      });
+
+      geo.computeBoundingBox();
+      const centerOffset = (geo.boundingBox.max.x - geo.boundingBox.min.x) / 2;
+
+      const mat  = new THREE.MeshBasicMaterial({ color: ROSE });
+      const mesh = new THREE.Mesh(geo, mat);
+
+      // Position sur l'arc
+      const angle = (i / (letters.length - 1) - 0.5) * totalAngle;
+      mesh.position.set(
+        Math.sin(angle) * radius - centerOffset,
+        yPos,
+        Math.cos(angle) * 4 + zBase
+      );
+
+      // Rotation pour suivre la courbure de l'arc
+      mesh.rotation.y = -angle;
+
+      scene.add(mesh);
+    });
+  }
+);
 
 // ═══════════════════════════════════════════════
 //  POST-PROCESSING — COMPOSER UNIQUE
