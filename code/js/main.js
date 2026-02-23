@@ -212,7 +212,7 @@ fontLoader.load(
   (font) => {
     // Lettres avec espacement vaporwave
     const letters = ['C', ' ', 'R', ' ', 'A', ' ', 'Z', ' ', 'Y', ' ', ' ', ' ', 'D', ' ', 'A', ' ', 'N'];
-    const radius  = 7;   // même rayon que le visualiseur
+    const radius  = 5.5;   // même rayon que le visualiseur
     const yPos    = -4.2;   // sous le visualiseur
     const zBase   = -12;  // même profondeur que le visualiseur
 
@@ -246,7 +246,7 @@ fontLoader.load(
       );
 
       // Rotation pour suivre la courbure de l'arc
-      mesh.rotation.y = -angle;
+      mesh.rotation.y = angle;
 
       scene.add(mesh);
     });
