@@ -179,28 +179,39 @@ const particles = new THREE.Points(particleGeo, particleMat);
 scene.add(particles);
 
 // ═══════════════════════════════════════════════
+//  THREE.JS — LookAt SPHERE
+// ═══════════════════════════════════════════════
+
+  const markerGeo = new THREE.SphereGeometry(0.2, 8, 8);
+  const markerMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+  const marker    = new THREE.Mesh(markerGeo, markerMat);
+  marker.position.set(0, 7.5, -0.7); // même coordonnées que le lookAt
+  scene.add(marker);
+
+// ═══════════════════════════════════════════════
 //  THREE.JS — VISUALISEUR AUDIO
 // ═══════════════════════════════════════════════
 
-const BAR_COUNT      = 64;
+const BAR_COUNT      = 32;
 const visualizerBars = [];
 
 for (let i = 0; i < BAR_COUNT; i++) {
-  const geo = new THREE.BoxGeometry(0.2, 1, 0.2);
-  geo.translate(0, 0.5, 0); // origine en bas → scale depuis le bas
+  const geo = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+  geo.translate(0, 2.75, 2.2); // origine en bas → scale depuis le bas
 
   const t     = i / BAR_COUNT;
   const color = new THREE.Color().lerpColors(new THREE.Color(ROSE), new THREE.Color(CYAN), t);
   const mat   = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.5 });
-
+  
   const bar   = new THREE.Mesh(geo, mat);
-  const angle = (t - 0.5) * Math.PI * 0.8;
-  bar.position.set(Math.sin(angle) * 10, -3.5, Math.cos(angle) * 4 - 12);
-  bar.lookAt(0, -3.5, -5);
+  const angle = 0*Math.PI//(t - 0.5) * Math.PI * 0.8;
+  bar.position.set(0, 0, 1); //bar.position.set(Math.sin(angle), 0, Math.cos(angle));
+  bar.lookAt(0, 7.15, -0.7);
 
   scene.add(bar);
   visualizerBars.push(bar);
 }
+
 
 // ═══════════════════════════════════════════════
 //  THREE.JS — TITRE TEXTE 3D COURBÉ
@@ -211,16 +222,16 @@ fontLoader.load(
   'https://cdn.jsdelivr.net/npm/three@0.169.0/examples/fonts/helvetiker_bold.typeface.json',
   (font) => {
     const chars     = ['C', 'R', 'A', 'Z', 'Y', 'D', 'A', 'N'];
-    const totalW    = 9.0;   // largeur totale de la ligne de lettres
-    const zPos      = -10;   // profondeur fixe (devant le visualiseur)
-    const yBase     = -4.0;  // hauteur de base
-    const curvature = 0.3;   // amplitude de la courbe en Y
+    const totalW    = 15;   // largeur totale de la ligne de lettres
+    const zPos      = -6;   // profondeur fixe (devant le visualiseur)
+    const yBase     = -10;  // hauteur de base
+    const curvature = 1.2;   // amplitude de la courbe en Y
 
     chars.forEach((char, i) => {
       const geo = new TextGeometry(char, {
         font,
         size:          0.9,
-        depth:         0.15,
+        depth:         1,
         curveSegments: 6,
         bevelEnabled:  false,
       });
@@ -236,10 +247,13 @@ fontLoader.load(
       const xPos = (t - 0.5) * totalW - w / 2;
 
       // Courbe en Y : parabole vers le bas au centre
-      const yPos = yBase - curvature * Math.pow((t - 0.5) * 2, 2);
+      const yPos = yBase + curvature * Math.pow((t - 0.5) * 2, 2);
 
       mesh.position.set(xPos, yPos, zPos);
-      mesh.rotation.y = 0; // toutes les lettres face caméra
+      mesh.rotation.x = -0.25 //-1.175 + t//(t - 0.5);
+      mesh.rotation.y = (t - 0.5) * 0.5; // toutes les lettres face caméra
+      // Rotation Z : inclinaison des lettres selon leur position sur la courbe
+      mesh.rotation.z = (t - 0.5) * 0; // valeur à ajuster — négatif = penche à gauche, positif = droite
 
       scene.add(mesh);
     });
