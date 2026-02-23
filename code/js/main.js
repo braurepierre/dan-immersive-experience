@@ -128,7 +128,6 @@ function createFloatingImages(imagePaths) {
 
       scene.add(mesh);
       floatingPlanes.push(mesh);
-      // Images flottantes : PAS sur le bloom layer (textures → halo non désiré)
     });
   });
 }
@@ -166,12 +165,12 @@ particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions
 particleGeo.setAttribute('color',    new THREE.BufferAttribute(particleColors,    3));
 
 const particleMat = new THREE.PointsMaterial({
-  size:           0.06,
-  vertexColors:   true,
-  transparent:    true,
-  opacity:        0.75,
-  blending:       THREE.AdditiveBlending,
-  depthWrite:     false,
+  size:            0.06,
+  vertexColors:    true,
+  transparent:     true,
+  opacity:         0.75,
+  blending:        THREE.AdditiveBlending,
+  depthWrite:      false,
   sizeAttenuation: true,
 });
 
@@ -203,60 +202,18 @@ for (let i = 0; i < BAR_COUNT; i++) {
 }
 
 // ═══════════════════════════════════════════════
-//  F1 — BLOOM VOLUMÉTRIQUE (UnrealBloomPass)
-//  Technique : selective bloom sur couche dédiée (layer 1)
+//  POST-PROCESSING — COMPOSER UNIQUE
+//  UnrealBloom global + RGB shift + Glitch + Output
 // ═══════════════════════════════════════════════
 
-const BLOOM_LAYER   = 1;
-const bloomLayerObj = new THREE.Layers();
-bloomLayerObj.set(BLOOM_LAYER);
-
-// Assigner les objets néon au bloom layer (layer 0 reste actif aussi)
-grid.layers.enable(BLOOM_LAYER);
-particles.layers.enable(BLOOM_LAYER);
-visualizerBars.forEach(bar => bar.layers.enable(BLOOM_LAYER));
-
-// Composer bloom — rend uniquement les objets sur BLOOM_LAYER
 const bloomPass = new UnrealBloomPass(
   new THREE.Vector2(window.innerWidth, window.innerHeight),
-  1.2,  // strength — intensité du halo
-  0.6,  // radius  — rayon du halo
-  0.1   // threshold — seuil de luminosité déclenchant le bloom
+  1.2,  // strength
+  0.6,  // radius
+  0.1   // threshold
 );
-const bloomComposer = new EffectComposer(renderer);
-bloomComposer.renderToScreen = false;
-bloomComposer.addPass(new RenderPass(scene, camera));
-bloomComposer.addPass(bloomPass);
 
-// Shader de fusion : scène originale (baseTexture) + texture bloom (bloomTexture)
-const mixPass = new ShaderPass(
-  new THREE.ShaderMaterial({
-    uniforms: {
-      baseTexture:  { value: null }, // auto-alimenté par ShaderPass depuis le pass précédent
-      bloomTexture: { value: null }, // mis à jour manuellement chaque frame dans animate()
-    },
-    vertexShader: `
-      varying vec2 vUv;
-      void main() {
-        vUv = uv;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-      }
-    `,
-    fragmentShader: `
-      uniform sampler2D baseTexture;
-      uniform sampler2D bloomTexture;
-      varying vec2 vUv;
-      void main() {
-        // Addition additive : les halos bloom s'ajoutent à la scène normale
-        gl_FragColor = texture2D(baseTexture, vUv) + texture2D(bloomTexture, vUv);
-      }
-    `,
-  }),
-  'baseTexture' // ShaderPass met automatiquement la sortie du pass précédent dans 'baseTexture'
-);
-mixPass.needsSwap = true;
-
-// Shader d'aberration chromatique permanente (hérité du pipeline d'origine)
+// Aberration chromatique permanente
 const rgbShiftShader = {
   uniforms: {
     tDiffuse: { value: null },
@@ -284,35 +241,17 @@ const rgbShiftShader = {
   `,
 };
 
-const rgbPass   = new ShaderPass(rgbShiftShader);
+const rgbPass    = new ShaderPass(rgbShiftShader);
 const glitchPass = new GlitchPass();
 glitchPass.enabled = false;
 
-// Composer final : scène complète + bloom fusionné + RGB shift + glitch + output
-const finalComposer = new EffectComposer(renderer);
-finalComposer.addPass(new RenderPass(scene, camera));
-finalComposer.addPass(mixPass);
-finalComposer.addPass(rgbPass);
-finalComposer.addPass(glitchPass);
-finalComposer.addPass(new OutputPass());
-
-// ── Helpers : masquer / restaurer les objets hors bloom layer ──
-
-// Cache les objets hors bloom layer avant le rendu du bloomComposer
-function _masquerNonBloom(obj) {
-  if ((obj.isMesh || obj.isPoints || obj.isLine) && !bloomLayerObj.test(obj.layers)) {
-    obj.userData.visibleAvantBloom = obj.visible;
-    obj.visible = false;
-  }
-}
-
-// Restaure la visibilité après le rendu du bloomComposer
-function _restaurerVisibilite(obj) {
-  if (obj.userData.visibleAvantBloom !== undefined) {
-    obj.visible = obj.userData.visibleAvantBloom;
-    delete obj.userData.visibleAvantBloom;
-  }
-}
+// Composer unique — 1 seul rendu par frame
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+composer.addPass(bloomPass);
+composer.addPass(rgbPass);
+composer.addPass(glitchPass);
+composer.addPass(new OutputPass());
 
 // ═══════════════════════════════════════════════
 //  GLITCH ALÉATOIRE
@@ -336,8 +275,8 @@ setTimeout(triggerGlitch, 3000);
 //  CURSEUR CUSTOM & TRAÎNÉE
 // ═══════════════════════════════════════════════
 
-const cursorDot   = document.getElementById('cursor-dot');
-const trailDots   = [];
+const cursorDot    = document.getElementById('cursor-dot');
+const trailDots    = [];
 const TRAIL_LENGTH = 15;
 
 for (let i = 0; i < TRAIL_LENGTH; i++) {
@@ -442,32 +381,18 @@ function animate() {
   for (let i = 0; i < BAR_COUNT; i++) {
     const val         = freqData ? freqData[i] / 255 : 0;
     const targetScale = 0.1 + val * 4;
-    visualizerBars[i].scale.y             += (targetScale - visualizerBars[i].scale.y) * 0.15;
-    visualizerBars[i].material.opacity     = 0.2 + val * 0.6;
+    visualizerBars[i].scale.y         += (targetScale - visualizerBars[i].scale.y) * 0.15;
+    visualizerBars[i].material.opacity = 0.2 + val * 0.6;
   }
 
   // ── Aberration chromatique modulée par l'audio ──
   rgbPass.uniforms.amount.value = 0.002 + avgAudio * 0.008;
 
-  // ── F1 Bloom : rendu sélectif en deux passes ──
-
-  // 1. Masquer les objets hors bloom layer
-  scene.traverse(_masquerNonBloom);
-
-  // 2. Rendre uniquement les objets bloom → texture bloom
-  bloomComposer.render();
-
-  // 3. Restaurer la visibilité de tous les objets
-  scene.traverse(_restaurerVisibilite);
-
-  // 4. Modulation de l'intensité du bloom par le volume audio
+  // ── Bloom modulé par le volume audio ──
   bloomPass.strength = 1.2 + avgAudio * 1.5;
 
-  // 5. Mettre à jour la référence vers la texture bloom fraîchement rendue
-  mixPass.uniforms.bloomTexture.value = bloomComposer.readBuffer.texture;
-
-  // 6. Rendu final : scène complète + bloom fusionné + RGB shift + glitch
-  finalComposer.render();
+  // ── Rendu — 1 seul composer ──
+  composer.render();
 }
 
 // ═══════════════════════════════════════════════
@@ -480,8 +405,7 @@ window.addEventListener('resize', () => {
   camera.aspect = w / h;
   camera.updateProjectionMatrix();
   renderer.setSize(w, h);
-  bloomComposer.setSize(w, h);
-  finalComposer.setSize(w, h);
+  composer.setSize(w, h);
   bloomPass.resolution.set(w, h);
 });
 

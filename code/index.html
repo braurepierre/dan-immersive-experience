@@ -23,27 +23,6 @@
       font-family: 'Monoton', cursive;
     }
 
-    /* ── Background media layers ── */
-    #bg-current, #bg-next {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: 0;
-      filter: saturate(1.8) hue-rotate(15deg) brightness(0.7);
-      transition: opacity 1.5s ease-in-out;
-    }
-
-    #bg-current {
-      opacity: 1;
-    }
-
-    #bg-next {
-      opacity: 0;
-    }
-
     /* ── Scanlines overlay ── */
     #scanlines {
       position: fixed;
@@ -212,11 +191,6 @@
   </style>
 </head>
 <body>
-
-  <!-- Background media layers -->
-  <video id="bg-current" muted playsinline></video>
-  <img id="bg-next-img" alt="" style="position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0;filter:saturate(1.8) hue-rotate(15deg) brightness(0.7);opacity:0;transition:opacity 1.5s ease-in-out;">
-  <video id="bg-next-vid" muted playsinline style="position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0;filter:saturate(1.8) hue-rotate(15deg) brightness(0.7);opacity:0;transition:opacity 1.5s ease-in-out;"></video>
 
   <!-- Vignette -->
   <div id="vignette"></div>
