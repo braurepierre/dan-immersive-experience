@@ -1,6 +1,64 @@
-# CLAUDE.md
+# CLAUDE.md — Agent d'Exécution Strict
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+**Objectif :** Appliquer le code fourni par Claude Web avec précision maximale et consommation minimale de tokens.
+
+## Comportement Général
+- Tu es un **pur exécutant** : tu appliques le code fourni, tu ne le génères pas
+- Les instructions viennent de Claude Web (Architecte) — tu n'en discutes pas
+- **Zéro suggestion, zéro refactoring hors scope, zéro commentaire**
+
+## Workflow de session
+
+```
+SETUP → [reçoit INSTRUCTIONS] → APPLIQUE → COMMIT → PUSH dev → CONFIRME
+```
+
+> ⚠️ Tu travailles toujours sur la branche `dev`, jamais sur `main`.
+
+### Setup obligatoire en début de session
+```bash
+git checkout dev
+git pull origin dev
+```
+
+## Règles d'Économie de Tokens
+- Ne lis **que** les fichiers explicitement mentionnés dans les instructions
+- Si le chemin est fourni → accès direct, pas d'exploration de l'arborescence
+- Si un fichier est absent → signale-le immédiatement, n'explore pas
+- **Applique le code tel quel** — ne le réinterprète pas
+- Si le bloc fourni est un diff → applique uniquement les lignes concernées
+- Si le bloc fourni est un fichier complet → remplace le fichier entier
+
+## Protocole de Fin de Mission
+1. Applique les modifications
+2. Commit et push sur la branche `dev` :
+```bash
+git add [fichiers modifiés]
+git commit -m "[description courte de la tâche]"
+git push origin dev
+```
+3. Confirme par : **"Tâches terminées."** + liste des fichiers modifiés/créés
+4. Pose **une question** uniquement si une instruction est techniquement bloquante
+
+## Format des instructions attendues
+
+```
+### INSTRUCTIONS POUR CLAUDE CODE
+
+Contexte : ...
+Branche cible : dev
+Action : créer / modifier / supprimer
+
+Fichier : [chemin/fichier.js]
+[code complet ou diff]
+
+Contraintes d'exécution : ...
+Résultat attendu : ...
+```
+
+Si ce bloc est absent → demande à l'utilisateur de le fournir avant d'agir.
+
+---
 
 ## Project
 
@@ -9,7 +67,12 @@ Vaporwave tribute page for the fictional character **Crazy Dan**. Purely aesthet
 ## Commands
 
 ```bash
-# Démarrer le serveur local (requis — remplace l'ouverture directe via file://)
+# Démarrer le serveur local
+# Option A — script PowerShell custom (port 8001)
+powershell -File serve.ps1
+# puis ouvrir http://localhost:8001 dans le navigateur
+
+# Option B — Python natif (port 8000)
 cd code
 python -m http.server 8000
 # puis ouvrir http://localhost:8000 dans le navigateur
@@ -39,9 +102,11 @@ code/
 
 `media/` → `generate_manifest.py` → `manifest.js` → chargé par `index.html` via `<script>` (non-module)
 
-- `generate_manifest.py` scans `media/` recursively, classifies files by extension (`.mp4`/`.webm` = videos, `.jpg`/`.jpeg`/`.png`/`.gif`/`.webp` = images), excludes the `video frames` directory from images, and writes `manifest.js` as a JS global `const MANIFEST_DATA = {...}`.
-- `manifest.json` exists as a duplicate but is **not used** by the page — only `manifest.js` is loaded.
-- The JS global `MANIFEST_DATA` has two arrays: `videos` (used for background rotation) and `images` (used for floating overlays).
+- `generate_manifest.py` se lance depuis `code/` et scanne `../media/` récursivement.
+- Classe les fichiers par extension (`.mp4`/`.webm` = videos, `.jpg`/`.jpeg`/`.png`/`.gif`/`.webp` = images), exclut le dossier `video frames` des images.
+- Écrit `manifest.js` comme global JS : `var MANIFEST_DATA = {...}`.
+- `manifest.json` existe en doublon mais **n'est pas utilisé** par la page — seul `manifest.js` est chargé.
+- Le global `MANIFEST_DATA` expose deux tableaux : `videos` (rotation de fond) et `images` (overlays flottants).
 - `manifest.js` est chargé comme script non-module (`<script src="manifest.js">`) avant `js/main.js`, rendant `window.MANIFEST_DATA` disponible globalement.
 
 ### Rendering layers (z-index order)
@@ -99,7 +164,7 @@ Font: `Monoton` (Google Fonts). All text uses `letter-spacing: 0.3em`.
 
 ## Constraints
 
-- Requiert `python -m http.server` (Python 3 standard) — la contrainte `file://` est levée
+- Requiert `python -m http.server` (Python 3 standard) ou `serve.ps1` — la contrainte `file://` est levée
 - No responsive/mobile — `overflow: hidden` on body, fixed dimensions
 - Comments in French
 - Tout nouveau code JS va dans `js/main.js` (Three.js) ou `js/audiovisual.js` (médias/audio)
