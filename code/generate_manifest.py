@@ -8,7 +8,7 @@ Usage: python generate_manifest.py
 import os
 import json
 
-MEDIA_DIR = "media"
+MEDIA_DIR = "../media"
 OUTPUT_FILE = "manifest.js"
 
 VIDEO_EXTENSIONS = {".mp4", ".webm"}
