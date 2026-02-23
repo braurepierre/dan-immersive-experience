@@ -210,43 +210,36 @@ const fontLoader = new FontLoader();
 fontLoader.load(
   'https://cdn.jsdelivr.net/npm/three@0.169.0/examples/fonts/helvetiker_bold.typeface.json',
   (font) => {
-    // Lettres avec espacement vaporwave
-    const letters = ['C', ' ', 'R', ' ', 'A', ' ', 'Z', ' ', 'Y', ' ', ' ', ' ', 'D', ' ', 'A', ' ', 'N'];
-    const radius  = 5.5;   // même rayon que le visualiseur
-    const yPos    = -4.2;   // sous le visualiseur
-    const zBase   = -12;  // même profondeur que le visualiseur
+    const chars     = ['C', 'R', 'A', 'Z', 'Y', 'D', 'A', 'N'];
+    const totalW    = 9.0;   // largeur totale de la ligne de lettres
+    const zPos      = -10;   // profondeur fixe (devant le visualiseur)
+    const yBase     = -4.0;  // hauteur de base
+    const curvature = 0.3;   // amplitude de la courbe en Y
 
-    // Arc centré, même amplitude que le visualiseur (PI * 0.8)
-    const totalAngle = Math.PI * 0.8;
-    const step       = totalAngle / (letters.length - 1);
-
-    letters.forEach((char, i) => {
-      if (char === ' ') return; // ignorer les espaces
-
+    chars.forEach((char, i) => {
       const geo = new TextGeometry(char, {
         font,
-        size:           0.9,
-        depth:          0.15,
-        curveSegments:  6,
-        bevelEnabled:   false,
+        size:          0.9,
+        depth:         0.15,
+        curveSegments: 6,
+        bevelEnabled:  false,
       });
 
       geo.computeBoundingBox();
-      const centerOffset = (geo.boundingBox.max.x - geo.boundingBox.min.x) / 2;
+      const w = geo.boundingBox.max.x - geo.boundingBox.min.x;
 
       const mat  = new THREE.MeshBasicMaterial({ color: ROSE });
       const mesh = new THREE.Mesh(geo, mat);
 
-      // Position sur l'arc
-      const angle = (i / (letters.length - 1) - 0.5) * totalAngle;
-      mesh.position.set(
-        Math.sin(angle) * radius - centerOffset,
-        yPos,
-        Math.cos(angle) * 4 + zBase
-      );
+      // Position X : répartition uniforme centrée
+      const t  = i / (chars.length - 1); // 0 → 1
+      const xPos = (t - 0.5) * totalW - w / 2;
 
-      // Rotation pour suivre la courbure de l'arc
-      mesh.rotation.y = angle;
+      // Courbe en Y : parabole vers le bas au centre
+      const yPos = yBase - curvature * Math.pow((t - 0.5) * 2, 2);
+
+      mesh.position.set(xPos, yPos, zPos);
+      mesh.rotation.y = 0; // toutes les lettres face caméra
 
       scene.add(mesh);
     });
