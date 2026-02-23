@@ -212,8 +212,8 @@ fontLoader.load(
   (font) => {
     // Lettres avec espacement vaporwave
     const letters = ['C', ' ', 'R', ' ', 'A', ' ', 'Z', ' ', 'Y', ' ', ' ', ' ', 'D', ' ', 'A', ' ', 'N'];
-    const radius  = 10;   // même rayon que le visualiseur
-    const yPos    = -5;   // sous le visualiseur
+    const radius  = 7;   // même rayon que le visualiseur
+    const yPos    = -4.2;   // sous le visualiseur
     const zBase   = -12;  // même profondeur que le visualiseur
 
     // Arc centré, même amplitude que le visualiseur (PI * 0.8)
@@ -225,7 +225,7 @@ fontLoader.load(
 
       const geo = new TextGeometry(char, {
         font,
-        size:           0.6,
+        size:           0.9,
         depth:          0.15,
         curveSegments:  6,
         bevelEnabled:   false,
