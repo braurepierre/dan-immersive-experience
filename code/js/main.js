@@ -4,7 +4,6 @@ import { RenderPass }      from 'three/addons/postprocessing/RenderPass.js';
 import { ShaderPass }      from 'three/addons/postprocessing/ShaderPass.js';
 import { GlitchPass }      from 'three/addons/postprocessing/GlitchPass.js';
 import { OutputPass }      from 'three/addons/postprocessing/OutputPass.js';
-import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import {
   shuffle,
   initLayers,
@@ -206,13 +205,6 @@ for (let i = 0; i < BAR_COUNT; i++) {
 //  UnrealBloom global + RGB shift + Glitch + Output
 // ═══════════════════════════════════════════════
 
-const bloomPass = new UnrealBloomPass(
-  new THREE.Vector2(512, 512),
-  0.8,  // strength réduite
-  0.4,  // radius réduit
-  0.2   // threshold relevé
-);
-
 // Aberration chromatique permanente
 const rgbShiftShader = {
   uniforms: {
@@ -248,7 +240,6 @@ glitchPass.enabled = false;
 // Composer unique — 1 seul rendu par frame
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
-composer.addPass(bloomPass);
 composer.addPass(rgbPass);
 composer.addPass(glitchPass);
 composer.addPass(new OutputPass());
@@ -387,9 +378,6 @@ function animate() {
 
   // ── Aberration chromatique modulée par l'audio ──
   rgbPass.uniforms.amount.value = 0.002 + avgAudio * 0.008;
-
-  // ── Bloom modulé par le volume audio ──
-  bloomPass.strength = 1.2 + avgAudio * 1.5;
 
   // ── Rendu — 1 seul composer ──
   composer.render();
