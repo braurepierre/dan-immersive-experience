@@ -46,9 +46,9 @@ const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerH
 camera.position.set(0, 5, 12);
 camera.lookAt(0, -1, -5);
 
-const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setPixelRatio(1);
 renderer.domElement.style.cssText = 'position:fixed;top:0;left:0;z-index:1;pointer-events:none;';
 document.body.appendChild(renderer.domElement);
 
@@ -56,7 +56,7 @@ document.body.appendChild(renderer.domElement);
 //  THREE.JS — GRILLE 3D RÉACTIVE
 // ═══════════════════════════════════════════════
 
-const gridGeo = new THREE.PlaneGeometry(60, 40, 80, 50);
+const gridGeo = new THREE.PlaneGeometry(60, 40, 30, 20);
 gridGeo.rotateX(-Math.PI / 2);
 const gridMat = new THREE.MeshBasicMaterial({
   color:       VIOLET,
@@ -76,7 +76,7 @@ const gridOrigX = new Float32Array(gridGeo.attributes.position.count);
 for (let i = 0; i < gridOrigX.length; i++) gridOrigX[i] = gridGeo.attributes.position.getX(i);
 
 // Taille d'une cellule pour le scroll seamless
-const gridCellZ = 40 / 50;
+const gridCellZ = 40 / 20;
 
 // ═══════════════════════════════════════════════
 //  THREE.JS — IMAGES FLOTTANTES 3D
@@ -136,7 +136,7 @@ function createFloatingImages(imagePaths) {
 //  THREE.JS — PARTICULES NÉON
 // ═══════════════════════════════════════════════
 
-const PARTICLE_COUNT    = 2500;
+const PARTICLE_COUNT    = 500;
 const particleGeo       = new THREE.BufferGeometry();
 const particlePositions = new Float32Array(PARTICLE_COUNT * 3);
 const particleColors    = new Float32Array(PARTICLE_COUNT * 3);
