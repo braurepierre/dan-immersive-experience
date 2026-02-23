@@ -207,10 +207,10 @@ for (let i = 0; i < BAR_COUNT; i++) {
 // ═══════════════════════════════════════════════
 
 const bloomPass = new UnrealBloomPass(
-  new THREE.Vector2(window.innerWidth, window.innerHeight),
-  1.2,  // strength
-  0.6,  // radius
-  0.1   // threshold
+  new THREE.Vector2(512, 512),
+  0.8,  // strength réduite
+  0.4,  // radius réduit
+  0.2   // threshold relevé
 );
 
 // Aberration chromatique permanente
@@ -406,7 +406,7 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix();
   renderer.setSize(w, h);
   composer.setSize(w, h);
-  bloomPass.resolution.set(w, h);
+  // bloomPass.resolution fixe — pas de resize
 });
 
 // ═══════════════════════════════════════════════
