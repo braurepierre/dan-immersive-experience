@@ -47,9 +47,24 @@
 **Décisions :**
 - Les trois fichiers `contexte-conversation_*.md` remplacés par un unique `DEVLOG.md` consolidé
 - Nouveau workflow : DEVLOG.md régénéré en fin de chaque session + livré à Claude Code pour commit/push
-- Instructions projet (system prompt Architecte) mises à jour avec la section "Fin de session"
+- Instructions projet mises à jour avec la section "Fin de session" — précision ajoutée : le fichier markdown livré à Claude Code doit contenir l'intégralité du message (header "INSTRUCTIONS POUR CLAUDE CODE" inclus)
 
 **TODO :** Supprimer les trois anciens fichiers `contexte-conversation_*.md` du repo.
+
+---
+
+## Session 4 — Restructuration instructions projet + bonnes pratiques workflow
+
+**Décisions :**
+- Instructions projet restructurées en deux parties distinctes : Partie 1 (bonnes pratiques transversales) / Partie 2 (spécifications techniques du projet)
+- Même restructuration appliquée au projet `voice-input-extension`
+- Stratégie retenue pour la maintenance multi-projets : duplication assumée de la Partie 1, mise à jour manuelle en cas d'évolution des bonnes pratiques
+- Dossier local renommé `dan-immersive-experience` (sans impact Git)
+- Incident : instructions Claude Code transmises au mauvais projet (`voice-input-extension`) → rollback `git reset --hard HEAD~1 --force` appliqué
+
+**TODO :**
+- Supprimer les trois anciens fichiers `contexte-conversation_*.md` du repo (reporté depuis session 3)
+- Mettre à jour les instructions projet dans Claude avec le nouveau format Partie 1 / Partie 2
 
 ---
 
