@@ -1,7 +1,5 @@
 # DEVLOG — dan-immersive-experience
 
----
-
 ## Session 1 — Workflow & Setup GitHub
 
 **Décisions :**
@@ -47,7 +45,7 @@
 **Décisions :**
 - Les trois fichiers `contexte-conversation_*.md` remplacés par un unique `DEVLOG.md` consolidé
 - Nouveau workflow : DEVLOG.md régénéré en fin de chaque session + livré à Claude Code pour commit/push
-- Instructions projet mises à jour avec la section "Fin de session" — précision ajoutée : le fichier markdown livré à Claude Code doit contenir l'intégralité du message (header "INSTRUCTIONS POUR CLAUDE CODE" inclus)
+- Instructions projet mises à jour avec la section "Fin de session"
 
 **TODO :** Supprimer les trois anciens fichiers `contexte-conversation_*.md` du repo.
 
@@ -56,15 +54,30 @@
 ## Session 4 — Restructuration instructions projet + bonnes pratiques workflow
 
 **Décisions :**
-- Instructions projet restructurées en deux parties distinctes : Partie 1 (bonnes pratiques transversales) / Partie 2 (spécifications techniques du projet)
-- Même restructuration appliquée au projet `voice-input-extension`
-- Stratégie retenue pour la maintenance multi-projets : duplication assumée de la Partie 1, mise à jour manuelle en cas d'évolution des bonnes pratiques
-- Dossier local renommé `dan-immersive-experience` (sans impact Git)
-- Incident : instructions Claude Code transmises au mauvais projet (`voice-input-extension`) → rollback `git reset --hard HEAD~1 --force` appliqué
+- Instructions projet restructurées en deux parties : Partie 1 (bonnes pratiques) / Partie 2 (specs techniques)
+- Dossier local renommé `dan-immersive-experience`
+- Incident : instructions Claude Code transmises au mauvais projet → rollback `git reset --hard HEAD~1 --force`
 
 **TODO :**
 - Supprimer les trois anciens fichiers `contexte-conversation_*.md` du repo (reporté depuis session 3)
-- Mettre à jour les instructions projet dans Claude avec le nouveau format Partie 1 / Partie 2
+
+---
+
+## Session 5 — Refonte workflow GitHub + création CLAUDE_WEB.md
+
+**Décisions :**
+- 1 seule branche dans les fichiers du projet Claude Web : toujours `dev` uniquement
+- Exploration GitHub via API publique + copier-coller URL : Claude Web génère l'URL, l'utilisateur la colle
+- `REPO.md` abandonné — remplacé par l'approche API GitHub à la demande (plus fiable, zéro maintenance)
+- Création `CLAUDE_WEB.md` : instructions architecte Claude Web, séparées de `CLAUDE.md` (Claude Code)
+- Règle explicite : `CLAUDE.md` = Claude Code uniquement, jamais de workflow architecte dedans
+- `CLAUDE_WEB.md` et `CLAUDE.md` reformatés en style dense/machine (optimisé pour lecture agent)
+- Format des blocs "INSTRUCTIONS POUR CLAUDE CODE" optimisé pour parsing agent
+
+**TODO :**
+- Supprimer les trois anciens fichiers `contexte-conversation_*.md` du repo (reporté depuis session 3)
+- Supprimer le marker sphère rouge (debug) dans `main.js`
+- Distribuer les barres du visualiseur en arc
 
 ---
 
