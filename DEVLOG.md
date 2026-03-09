@@ -96,6 +96,17 @@
 
 ---
 
+## Session 7 — Cleanup fichiers de config + init claude-workflow
+
+**Décisions :**
+- `CLAUDE_WEB.md` allégé → Partie 2 specs uniquement + référence à claude-workflow
+- `CLAUDE.md` allégé → règles génériques + commandes projet + référence à claude-workflow
+- Repo `claude-workflow` créé et ajouté au Projet Claude pour sync automatique en début de session
+
+**TODO :** aucun.
+
+---
+
 ## Paramètres scène actuels (référence)
 
 ```
