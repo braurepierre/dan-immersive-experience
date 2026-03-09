@@ -81,6 +81,21 @@
 
 ---
 
+## Session 6 — Reprise projet + nettoyage TODO + schéma workflow
+
+**Décisions :**
+- Reprise après pause — récap complet du projet et du workflow via DEVLOG
+- Rôle de `CLAUDE_WEB.md` clarifié : référence statique (stack, conventions, format livrable) ≠ `DEVLOG.md` (mémoire chronologique)
+- Schéma workflow HTML produit dans l'esthétique vaporwave du projet (4 sections : agents, déroulé session, fichiers de référence, TODO)
+- TODO vidée intégralement :
+  - `contexte-conversation_*.md` : absents du repo et du projet → supprimés du TODO
+  - Marker sphère rouge : fait
+  - Barres visualiseur en arc : plus d'actualité
+
+**TODO :** aucun.
+
+---
+
 ## Paramètres scène actuels (référence)
 
 ```
