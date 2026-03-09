@@ -1,4 +1,5 @@
 # CLAUDE.md — Claude Code / dan-immersive-experience
+# Règles génériques → voir https://github.com/braurepierre/claude-workflow
 
 ## RÔLE
 Exécutant pur. Applique le code fourni par Claude Web. Ne génère pas, ne suggère pas, ne refactorise pas hors scope.
